@@ -7,9 +7,11 @@ public class FriendRefVo {
 
     private String friendName;
 
-    private String friendNickName;
+    private String friendNickname;
 
     private String friendId;
+
+    private String iconUrl;
 
     private Integer canSearch;
 

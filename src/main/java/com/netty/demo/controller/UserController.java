@@ -9,15 +9,19 @@ import com.netty.demo.utils.FileUtils;
 import com.netty.demo.utils.IMoocJSONResult;
 import com.netty.demo.utils.QRCodeUtils;
 import com.netty.demo.vo.FriendRefVo;
+import com.netty.demo.vo.FriendRequestVo;
 import com.netty.demo.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -89,6 +93,7 @@ public class UserController {
 
     @RequestMapping("friendRef")
     public IMoocJSONResult getFriendRef(String userId,String friendName){
+        log.info("用户:{} 搜索好友:{}",userId,friendName);
         Users friend = userService.findUserByCondition("username", friendName);
         if(null == friend){
             return IMoocJSONResult.errorMsg(FriendsState.ISNOTEXIST.getMsg());
@@ -108,9 +113,30 @@ public class UserController {
         friendRefVo.setFriendName(friend.getUsername());
         friendRefVo.setFriendId(friend.getId());
         friendRefVo.setCanSearch(0);
-        friendRefVo.setFriendNickName(friend.getNickname());
+        friendRefVo.setIconUrl(friend.getFaceImage());
+        friendRefVo.setFriendNickname(friend.getNickname());
         return IMoocJSONResult.ok(friendRefVo);
     }
 
+    @RequestMapping(value = "sendAddFriendMsg",method = RequestMethod.POST)
+    public IMoocJSONResult sendAddFriendRequest(String userId,String friendName){
+        if(StringUtils.isEmpty(userId) || StringUtils.isEmpty(friendName)){
+            return IMoocJSONResult.errorMsg("参数异常");
+        }
+        Boolean isSuccess = userService.addFriendRequest(userId, friendName);
+        if(isSuccess){
+            return IMoocJSONResult.ok("请求好友发送成功");
+        }
+        return IMoocJSONResult.errorMsg("请求好友发送失败");
+    }
+
+    @RequestMapping(value = "getFriendRequests",method = RequestMethod.GET)
+    public IMoocJSONResult getAddFriendRequests(String userId){
+        List<FriendRequestVo> friendList = userService.getFriendList(userId);
+        if(CollectionUtils.isEmpty(friendList)){
+            return IMoocJSONResult.ok(new ArrayList<FriendRequestVo>());
+        }
+        return IMoocJSONResult.ok(friendList);
+    }
 
 }

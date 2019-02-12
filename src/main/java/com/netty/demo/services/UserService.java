@@ -2,6 +2,9 @@ package com.netty.demo.services;
 
 import com.netty.demo.dto.Users;
 import com.netty.demo.enums.FriendsState;
+import com.netty.demo.vo.FriendRequestVo;
+
+import java.util.List;
 
 public interface UserService {
 
@@ -48,6 +51,23 @@ public interface UserService {
      * @return
      */
     public FriendsState getFriendRef(String userId,String friendId);
+
+
+    /**
+     * 添加好友请求
+     * @param userId
+     * @param friendName
+     * @return
+     */
+    public Boolean addFriendRequest(String userId,String friendName);
+
+    /**
+     * 获取用户当前的好友请求记录
+     * @param userId
+     * @return
+     */
+    public List<FriendRequestVo> getFriendList(String userId);
+
 
 
 

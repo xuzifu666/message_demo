@@ -4,10 +4,12 @@ import com.netty.demo.dto.ChatMsg;
 import com.netty.demo.dto.Users;
 import com.netty.demo.enums.FriendsState;
 import com.netty.demo.mapper.ChatMsgMapper;
+import com.netty.demo.mapper.UserCustomMapper;
 import com.netty.demo.services.UserService;
 import com.netty.demo.utils.FastDFSClient;
 import com.netty.demo.utils.FileUtils;
 import com.netty.demo.utils.QRCodeUtils;
+import com.netty.demo.vo.FriendRequestVo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +37,9 @@ public class DemoApplicationTests {
 
     @Autowired
     private FastDFSClient fastDFSClient;
+
+    @Autowired
+    private UserCustomMapper userCustomMapper;
 
     @Test
     public void contextLoads() {
@@ -76,6 +81,19 @@ public class DemoApplicationTests {
     public void testFriendRef(){
         FriendsState state = userService.getFriendRef("190209BSWS7STYNC", "190209BSWS7STYNC");
         log.info(state + "");
+    }
+
+    @Test
+    public void testAddFriend(){
+        Boolean aBoolean = userService.addFriendRequest("123123", "xuzifu");
+        log.info("添加的结果是:{}",aBoolean.toString());
+    }
+
+    @Test
+    public void testFriendReqeusts(){
+        List<FriendRequestVo> reqs = userCustomMapper.findFriendRequest("2121");
+        log.info("结果是{}",reqs.toString());
+
     }
 
 
