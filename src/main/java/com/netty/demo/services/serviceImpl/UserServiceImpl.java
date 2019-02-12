@@ -1,6 +1,9 @@
 package com.netty.demo.services.serviceImpl;
 
+import com.netty.demo.dto.FriendRelation;
 import com.netty.demo.dto.Users;
+import com.netty.demo.enums.FriendsState;
+import com.netty.demo.mapper.FriendMapper;
 import com.netty.demo.mapper.UsersMapper;
 import com.netty.demo.services.UserService;
 import com.netty.demo.utils.FastDFSClient;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
@@ -31,6 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FastDFSClient fastDFSClient;
+
+    @Autowired
+    private FriendMapper friendMapper;
 
     @Value("${fdfs.tmp.file.url}")
     private String tmpPath;
@@ -81,5 +89,41 @@ public class UserServiceImpl implements UserService {
         users.setNickname("");
         usersMapper.insertSelective(users);
         return users;
+    }
+
+    @Override
+    public Users findUserByCondition(String property, Object value) {
+        Example example = new Example(Users.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo(property,value);
+        List<Users> users = usersMapper.selectByExample(example);
+        if(!CollectionUtils.isEmpty(users)){
+            return users.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public FriendsState getFriendRef(String userId, String friendId) {
+        if(StringUtils.isEmpty(friendId)){
+            return FriendsState.ISNOTEXIST;
+        }
+        if(userId.equals(friendId)){
+            return FriendsState.ISSELEF;
+        }
+        Users users = new Users();
+        users.setId(friendId);
+        Users users1 = usersMapper.selectByPrimaryKey(users);
+        if(users1 == null){
+            return FriendsState.ISNOTEXIST;
+        }
+        Example example = new Example(FriendRelation.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("myUserId",userId).andEqualTo("myFriendUserId",friendId);
+        List<FriendRelation> friendRelations = friendMapper.selectByExample(example);
+        if(CollectionUtils.isEmpty(friendRelations)){
+            return FriendsState.CANSEARCH;
+        }
+        return FriendsState.ISFRIEND;
     }
 }

@@ -2,6 +2,7 @@ package com.netty.demo;
 
 import com.netty.demo.dto.ChatMsg;
 import com.netty.demo.dto.Users;
+import com.netty.demo.enums.FriendsState;
 import com.netty.demo.mapper.ChatMsgMapper;
 import com.netty.demo.services.UserService;
 import com.netty.demo.utils.FastDFSClient;
@@ -64,6 +65,19 @@ public class DemoApplicationTests {
         String s = fastDFSClient.uploadNormalFile(multipartFile);
         log.info(s);
     }
+
+    @Test
+    public void testFriend(){
+        Users user = userService.findUserByCondition("username", "姆巴佩");
+        log.info(user.toString());
+    }
+
+    @Test
+    public void testFriendRef(){
+        FriendsState state = userService.getFriendRef("190209BSWS7STYNC", "190209BSWS7STYNC");
+        log.info(state + "");
+    }
+
 
 }
 

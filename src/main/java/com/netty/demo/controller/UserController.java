@@ -2,11 +2,13 @@ package com.netty.demo.controller;
 
 import com.netty.demo.dto.UploadMsg;
 import com.netty.demo.dto.Users;
+import com.netty.demo.enums.FriendsState;
 import com.netty.demo.services.UserService;
 import com.netty.demo.utils.FastDFSClient;
 import com.netty.demo.utils.FileUtils;
 import com.netty.demo.utils.IMoocJSONResult;
 import com.netty.demo.utils.QRCodeUtils;
+import com.netty.demo.vo.FriendRefVo;
 import com.netty.demo.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -83,6 +85,31 @@ public class UserController {
         userService.updateUserInfo(users);
         log.info("图片信息已上传" + users.toString());
         return IMoocJSONResult.ok(users);
+    }
+
+    @RequestMapping("friendRef")
+    public IMoocJSONResult getFriendRef(String userId,String friendName){
+        Users friend = userService.findUserByCondition("username", friendName);
+        if(null == friend){
+            return IMoocJSONResult.errorMsg(FriendsState.ISNOTEXIST.getMsg());
+        }
+        FriendsState friendRef = userService.getFriendRef(userId, friend.getId());
+
+        if(friendRef == FriendsState.ISNOTEXIST){
+            return IMoocJSONResult.errorMsg(FriendsState.ISNOTEXIST.getMsg());
+        }
+        if(friendRef == FriendsState.ISFRIEND){
+            return IMoocJSONResult.errorMsg(FriendsState.ISFRIEND.getMsg());
+        }
+        if(friendRef == FriendsState.ISSELEF){
+            return IMoocJSONResult.errorMsg(FriendsState.ISSELEF.getMsg());
+        }
+        FriendRefVo friendRefVo = new FriendRefVo();
+        friendRefVo.setFriendName(friend.getUsername());
+        friendRefVo.setFriendId(friend.getId());
+        friendRefVo.setCanSearch(0);
+        friendRefVo.setFriendNickName(friend.getNickname());
+        return IMoocJSONResult.ok(friendRefVo);
     }
 
 

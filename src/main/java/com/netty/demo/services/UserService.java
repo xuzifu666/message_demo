@@ -1,6 +1,7 @@
 package com.netty.demo.services;
 
 import com.netty.demo.dto.Users;
+import com.netty.demo.enums.FriendsState;
 
 public interface UserService {
 
@@ -31,6 +32,22 @@ public interface UserService {
      * @return
      */
     public Users updateUserInfo(Users users);
+
+    /**
+     * 根据条件查询users信息
+     * @param property
+     * @param value
+     * @return
+     */
+    public Users findUserByCondition(String property,Object value);
+
+    /**
+     * 返回用户自己和其他用户的好友关系
+     * @param userId
+     * @param friendId
+     * @return
+     */
+    public FriendsState getFriendRef(String userId,String friendId);
 
 
 
