@@ -4,15 +4,13 @@ import com.netty.demo.dto.FriendRelation;
 import com.netty.demo.dto.FriendsRequest;
 import com.netty.demo.dto.Users;
 import com.netty.demo.enums.FriendsState;
+import com.netty.demo.enums.HandleFriendRequestType;
 import com.netty.demo.mapper.FriendMapper;
 import com.netty.demo.mapper.FriendsRequestMapper;
 import com.netty.demo.mapper.UserCustomMapper;
 import com.netty.demo.mapper.UsersMapper;
 import com.netty.demo.services.UserService;
-import com.netty.demo.utils.FastDFSClient;
-import com.netty.demo.utils.FileUtils;
-import com.netty.demo.utils.MD5Utils;
-import com.netty.demo.utils.QRCodeUtils;
+import com.netty.demo.utils.*;
 import com.netty.demo.vo.FriendRequestVo;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +24,7 @@ import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -172,5 +171,45 @@ public class UserServiceImpl implements UserService {
         }
         List<FriendRequestVo> friendRequests = userCustomMapper.findFriendRequest(userId);
         return friendRequests;
+    }
+
+    @Transactional
+    @Override
+    public Boolean handleFriendRequest(String userId, String friendId, HandleFriendRequestType type) {
+        //判断当前好友关系
+        Example e = new Example(FriendRelation.class);
+        Example.Criteria c = e.createCriteria();
+        c.andEqualTo("myUserId",userId).andEqualTo("myFriendUserId",friendId);
+        FriendRelation fr = friendMapper.selectOneByExample(e);
+        if(fr != null){
+            return false;
+        }
+        //拒绝好友请求
+        if(type == HandleFriendRequestType.REJIECT){
+            Example example = new Example(FriendsRequest.class);
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andEqualTo("sendUserId",friendId).andEqualTo("acceptUserId",userId);
+            int count = friendsRequestMapper.deleteByExample(example);
+            return count > 0 ? true : false;
+        }
+        //接受好友请求
+        if(type == HandleFriendRequestType.ACCEPT){
+            FriendRelation friendRelation = new FriendRelation();
+            friendRelation.setId(sid.nextShort());
+            friendRelation.setMyUserId(userId);
+            friendRelation.setMyFriendUserId(friendId);
+            friendMapper.insertSelective(friendRelation);
+            //双向好友关系均需要添加
+            friendRelation.setId(sid.nextShort());
+            friendRelation.setMyUserId(friendId);
+            friendRelation.setMyFriendUserId(userId);
+            friendMapper.insertSelective(friendRelation);
+            Example example = new Example(FriendsRequest.class);
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andEqualTo("sendUserId",friendId).andEqualTo("acceptUserId",userId);
+            int count = friendsRequestMapper.deleteByExample(example);
+            return count > 0 ? true : false;
+        }
+        return false;
     }
 }

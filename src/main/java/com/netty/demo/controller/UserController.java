@@ -3,6 +3,7 @@ package com.netty.demo.controller;
 import com.netty.demo.dto.UploadMsg;
 import com.netty.demo.dto.Users;
 import com.netty.demo.enums.FriendsState;
+import com.netty.demo.enums.HandleFriendRequestType;
 import com.netty.demo.services.UserService;
 import com.netty.demo.utils.FastDFSClient;
 import com.netty.demo.utils.FileUtils;
@@ -137,6 +138,21 @@ public class UserController {
             return IMoocJSONResult.ok(new ArrayList<FriendRequestVo>());
         }
         return IMoocJSONResult.ok(friendList);
+    }
+
+    @RequestMapping("operatorFriendRequest")
+    public IMoocJSONResult operatorFriendRequest(String userId,String friendId,Integer handleType){
+        log.info("{}处理好友{}请求",userId,friendId);
+        Boolean isSuccess ;
+        if(handleType == 0) {
+             isSuccess = userService.handleFriendRequest(userId, friendId, HandleFriendRequestType.REJIECT);
+             return isSuccess == true ? IMoocJSONResult.ok("拒绝好友成功") : IMoocJSONResult.errorMsg("拒绝好友失败");
+        }
+        if(handleType == 1){
+             isSuccess = userService.handleFriendRequest(userId, friendId, HandleFriendRequestType.ACCEPT);
+             return isSuccess == true ? IMoocJSONResult.ok("添加好友成功") : IMoocJSONResult.errorMsg("添加好友失败");
+        }
+        return IMoocJSONResult.errorMsg("未知处理方式");
     }
 
 }

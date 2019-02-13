@@ -2,6 +2,7 @@ package com.netty.demo.services;
 
 import com.netty.demo.dto.Users;
 import com.netty.demo.enums.FriendsState;
+import com.netty.demo.enums.HandleFriendRequestType;
 import com.netty.demo.vo.FriendRequestVo;
 
 import java.util.List;
@@ -69,6 +70,14 @@ public interface UserService {
     public List<FriendRequestVo> getFriendList(String userId);
 
 
+    /**
+     * 处理好友请求 handleType:0 拒绝 1接受
+     * @param userId
+     * @param friendId
+     * @param handleType
+     * @return
+     */
+    public Boolean handleFriendRequest(String userId, String friendId, HandleFriendRequestType type);
 
 
 }
