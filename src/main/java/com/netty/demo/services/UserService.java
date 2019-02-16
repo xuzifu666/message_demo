@@ -3,6 +3,7 @@ package com.netty.demo.services;
 import com.netty.demo.dto.Users;
 import com.netty.demo.enums.FriendsState;
 import com.netty.demo.enums.HandleFriendRequestType;
+import com.netty.demo.vo.FriendRefVo;
 import com.netty.demo.vo.FriendRequestVo;
 
 import java.util.List;
@@ -78,6 +79,13 @@ public interface UserService {
      * @return
      */
     public Boolean handleFriendRequest(String userId, String friendId, HandleFriendRequestType type);
+
+    /**
+     * 获取用户的好友信息
+     * @param userId
+     * @return
+     */
+    public List<FriendRefVo> getFriends(String userId);
 
 
 }

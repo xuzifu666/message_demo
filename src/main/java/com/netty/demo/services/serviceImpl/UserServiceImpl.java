@@ -11,6 +11,7 @@ import com.netty.demo.mapper.UserCustomMapper;
 import com.netty.demo.mapper.UsersMapper;
 import com.netty.demo.services.UserService;
 import com.netty.demo.utils.*;
+import com.netty.demo.vo.FriendRefVo;
 import com.netty.demo.vo.FriendRequestVo;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -211,5 +213,14 @@ public class UserServiceImpl implements UserService {
             return count > 0 ? true : false;
         }
         return false;
+    }
+
+    @Override
+    public List<FriendRefVo> getFriends(String userId) {
+        List<FriendRefVo> friends = userCustomMapper.getFriends(userId);
+        if(CollectionUtils.isEmpty(friends)){
+            return new ArrayList<FriendRefVo>();
+        }
+        return friends;
     }
 }

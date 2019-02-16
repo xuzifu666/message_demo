@@ -155,4 +155,14 @@ public class UserController {
         return IMoocJSONResult.errorMsg("未知处理方式");
     }
 
+    @GetMapping("getFriends")
+    public IMoocJSONResult getFriends(String userId){
+        log.info("用户{}查询好友列表信息",userId);
+        if(StringUtils.isEmpty(userId)){
+            return IMoocJSONResult.errorMsg("参数错误");
+        }
+        List<FriendRefVo> friends = userService.getFriends(userId);
+        return IMoocJSONResult.ok(friends);
+    }
+
 }
