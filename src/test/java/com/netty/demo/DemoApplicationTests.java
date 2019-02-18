@@ -1,6 +1,7 @@
 package com.netty.demo;
 
 import com.netty.demo.dto.ChatMsg;
+import com.netty.demo.dto.FileInfo;
 import com.netty.demo.dto.Users;
 import com.netty.demo.enums.FriendsState;
 import com.netty.demo.mapper.ChatMsgMapper;
@@ -11,10 +12,13 @@ import com.netty.demo.utils.FileUtils;
 import com.netty.demo.utils.QRCodeUtils;
 import com.netty.demo.vo.FriendRequestVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hadoop.hbase.client.Result;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.hadoop.hbase.HbaseTemplate;
+import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -93,6 +97,15 @@ public class DemoApplicationTests {
     public void testFriendReqeusts(){
         List<FriendRequestVo> reqs = userCustomMapper.findFriendRequest("2121");
         log.info("结果是{}",reqs.toString());
+
+    }
+
+
+    @Autowired
+    private HbaseTemplate hbaseTemplate;
+
+    @Test
+    public void hbaseTest(){
 
     }
 
